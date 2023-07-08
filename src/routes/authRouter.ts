@@ -14,7 +14,7 @@ const authRouter = Router();
 
 authRouter.post("/auth/signup", signup);
 authRouter.post("/auth/login", login);
-authRouter.get("/users/get-all", getAll);
+// authRouter.get("/users/get-all", getAll);
 authRouter.delete(
   "/auth/delete-user/:id",
   verifyToken as any,

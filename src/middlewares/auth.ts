@@ -21,7 +21,7 @@ export const verifyToken = (req: User, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       return res.status(404).json({
         success: false,
-        message: "Error! Token was not provided.",
+        message: "Token not found !",
       });
     }
     const token = req.headers.authorization.split(" ")[1];
@@ -29,10 +29,10 @@ export const verifyToken = (req: User, res: Response, next: NextFunction) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
     req.user = decodedToken as JwtPayload;
     next();
-  } catch (error) {
+  } catch (error: any) {
     return res.status(401).json({
       success: false,
-      message: "Unauthorized, check JWT",
+      message: error.message,
     });
   }
 };

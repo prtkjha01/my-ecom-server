@@ -1,32 +1,23 @@
-/***************************** HANDLED BUSINESS LOGIC IN THIS CONTROLLER FILE ***************************/
-// import jwt from "jsonwebtoken";
-import * as dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import userModel from "../models/userModel";
-import { signToken } from "../middlewares/auth";
 import { Request, Response } from "express";
 import sendMail from "../utils/mail";
 import otpGenerator from "otp-generator";
 import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
 import { User } from "../interfaces/userInterface";
-import authService from "../services/auth.service";
-
-dotenv.config();
-/***************************** SIGNUP FUNCTION, IF THE USER IS NEW ***************************/
-export const signup = async (req: Request, res: Response) => {
-  return authService.signup(req, res);
-};
-
-/***************************** LOGIN FUNCTION, IF THE USER IS ALREADY PRESENT IN OUR DATABASE ***************************/
-export const login = async (req: Request, res: Response) => {
-  return authService.login(req, res);
-};
 
 /********************** GET ALL FUNCTION, TO GET ALL THE USERS IN OUR DATABSE, ONLY ADMIN HAVE THE AUTHORITY TO CALL THIS FUNCTION***************************/
-export const getAll = async (req: Request, res: Response) => {
+const getAll = async (req: Request, res: Response) => {
+  const page: number | any = req.query.page;
+  const page_size: number | any = req.query.page_size;
+
   try {
-    const users = await userModel.find({}); // FETCHING ALL USER FORM THE DATABASE
+    const users = await userModel
+      .find({}, { createdAt: 0, updatedAt: 0, password: 0 })
+      .skip(page_size * (page - 1))
+      .limit(page_size);
+
     res.send(users);
   } catch (error) {
     res.status(500).send(error);
@@ -34,7 +25,7 @@ export const getAll = async (req: Request, res: Response) => {
 };
 
 /***************************** UPDATE FUNCTION, IF USER WANTS TO UPDATE HIS/HER ANY FIELD ***************************/
-export const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
   // const _id = decodedToken.userId
   try {
     const _id = req.params.id;
@@ -56,7 +47,7 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 /*************************************************************DELETE USER*****************************************************************/
-export const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req: Request, res: Response) => {
   try {
     const _id = req.params.id;
     const user: any = await userModel.findOne({ _id });
@@ -79,7 +70,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 /*************************************************************DELETE USER by EMAIL*****************************************************************/
-export const deleteUserByEmail = async (req: Request, res: Response) => {
+const deleteUserByEmail = async (req: Request, res: Response) => {
   try {
     let { email } = req.query;
     const user: any = await userModel.findOneAndDelete({ email });
@@ -105,7 +96,7 @@ export const deleteUserByEmail = async (req: Request, res: Response) => {
   }
 };
 
-export const forgotPassword = async (req: Request, res: Response) => {
+const forgotPassword = async (req: Request, res: Response) => {
   try {
     let otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
@@ -162,7 +153,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   }
 };
 
-export const updatePassword = async (req: User, res: Response) => {
+const updatePassword = async (req: User, res: Response) => {
   console.log("in here");
 
   try {
@@ -191,4 +182,13 @@ export const updatePassword = async (req: User, res: Response) => {
       message: "Internal server error",
     });
   }
+};
+
+export default {
+  getAll,
+  updateUser,
+  updatePassword,
+  deleteUser,
+  deleteUserByEmail,
+  forgotPassword,
 };
