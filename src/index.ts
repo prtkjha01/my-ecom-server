@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-/********************************************* CONNECTED APPLICATION WITH THE DATABASE ******************************************/
+/********************************************* DATABASE CONFIG ******************************************/
 mongoose.connect(
   process.env.URI_FOR_DB as string,
   {
@@ -34,7 +34,7 @@ app.get("/test", (req: any, res) => {
 /****************************************************************** ROUTER *************************************************************************/
 app.use(router);
 
-/********************************************* IF THE URL PROVIDED IS NOT CORRECT THEN THROW THESE ******************************************/
+/*********************************************************** UNDEFINED PATH HANDLER ********************************************************/
 app.get("*", (req, res) => {
   res.status(404).json({
     status: 404,
@@ -70,6 +70,7 @@ app.delete("*", (req, res) => {
   });
 });
 
+/********************************************* SERVER START ******************************************/
 app.listen(port, () => {
-  console.log("server is running on port", port);
+  console.log("Server is running on Port :", port);
 });
