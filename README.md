@@ -24,7 +24,7 @@ The My E-com Backend is a RESTful API built to support the My E-com online marke
 
 - ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)
 - ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
-  ![Typescript](https://img.shields.io/badge/Typescript-f5ecbf?style=flat&logo=Typescript&logoColor=007acc)
+- ![Typescript](https://img.shields.io/badge/Typescript-f5ecbf?style=flat&logo=Typescript&logoColor=007acc)
 
 ## Getting Started
 
