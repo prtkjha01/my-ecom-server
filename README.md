@@ -104,6 +104,10 @@ API documentation is available on this link [My E-com Docs](https://documenter.g
 
 `GET admin/getTotalPurchaseDetails`: Get total purchase details i.e. count of items purchased, total purchase amount, list of discount codes and total discount amount(Only the admin is authorized).
 
+## ER Diagram
+
+<img width="705" alt="Screenshot 2024-02-09 at 5 45 01 PM" src="https://github.com/prtkjha01/my-ecom-server/assets/68733176/1f1f9b72-c376-4231-90bb-659cbeb62aa4">
+
 ## Demo
 
 https://user-images.githubusercontent.com/110348583/217510610-827445d4-5d8d-41b6-b035-f117be55c7e9.mp4
