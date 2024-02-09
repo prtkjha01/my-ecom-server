@@ -10,7 +10,7 @@ import { checkAdmin, verifyToken } from "../middlewares/auth";
 
 const productRouter = Router();
 
-productRouter.get("/products/get-all", getAll);
+productRouter.get("/products", getAll);
 
 productRouter.get("/products/get/:id", getProductById);
 

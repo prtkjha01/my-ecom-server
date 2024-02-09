@@ -1,3 +1,4 @@
+import connectDB from "./db/index";
 import express, { Router } from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
@@ -10,28 +11,31 @@ app.use(cors());
 app.use(express.json());
 
 /********************************************* DATABASE CONFIG ******************************************/
-mongoose.connect(
-  process.env.URI_FOR_DB as string,
-  {
-    useNewUrlParser: true,
-    //useFindAndModify: false,
-    useUnifiedTopology: true,
-  } as ConnectOptions
-);
 
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error: "));
-db.once("open", function () {
-  console.log("DB Connected successfully");
-});
+connectDB();
 
+// mongoose.connect(
+//   process.env.URI_FOR_DB as string,
+//   {
+//     useNewUrlParser: true,
+//     //useFindAndModify: false,
+//     useUnifiedTopology: true,
+//   } as ConnectOptions
+// );
+
+// const db = mongoose.connection;
+// db.on("error", console.error.bind(console, "connection error: "));
+// db.once("open", function () {
+//   console.log("DB Connected successfully");
+// });
+
+/****************************************************************** ROUTER *************************************************************************/
 app.get("/", (req: any, res) => {
   res.send("<h1>Welcome to My E-com server</h1>");
 });
 app.get("/test", (req: any, res) => {
   res.send("<h1>Hello Test</h1>");
 });
-/****************************************************************** ROUTER *************************************************************************/
 app.use(router);
 
 /*********************************************************** UNDEFINED PATH HANDLER ********************************************************/
