@@ -38,6 +38,16 @@ const ProductSchema = new Schema(
         required: true
     },
     
+    faqs: {
+      type: [
+        {
+          question: String,
+          answer: String,
+        },
+      ],
+      default : []
+    },
+
     reviews: {
         type : [
             {
