@@ -1,29 +1,16 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+
 
 /**
- * Wraps an async request handler to ensure any errors are caught and passed to the next middleware.
+ * This function is an async handler that takes a request handler and returns a request handler.
  *
- * @param {Request} req - The request object
- * @param {Response} res - The response object
- * @param {NextFunction} next - The next middleware function
- * @return {void} 
+ * @param {Function} requestHandler - the request handler function to be executed
+ * @return {RequestHandler} a request handler function
  */
-const asyncHandler = (requestHandler) => {
+const asyncHandler =
+  (requestHandler: Function): RequestHandler =>
   (req: Request, res: Response, next: NextFunction) => {
-    
     Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
   };
-};
-
 export default asyncHandler;
-// const asyncHandler =
-//   (fn: any) => async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       await fn(req, res, next);
-//     } catch (error: any) {
-//       return res.status(error.code || 500).json({
-//         success: false,
-//         message: error.message,
-//       });
-//     }
-//   };
+
