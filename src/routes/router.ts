@@ -1,52 +1,22 @@
 import { Router, Request, Response } from "express";
+import undefinedPathHandler from "./undefinedPath.router";
 import productRouter from "./product.router";
 import authRouter from "./auth.router";
-import userRouter from "./userRouter";
+import cartRouter from "./cart.router";
+// import userRouter from "./userRouter";
 
 const router = Router();
 
 router.get("/", (req: Request, res: Response) => {
-    res.send("<h1>Welcome to My E-com server</h1>");
+  res.send("<h1>Welcome to My E-com server</h1>");
 });
 
-router.use('/auth', authRouter);
-router.use('/product', productRouter);
-router.use(userRouter);
+router.use("/auth", authRouter);
+router.use("/product", productRouter);
+router.use("/cart", cartRouter);
+// router.use(userRouter);
 
-/*********************************************************** UNDEFINED PATH HANDLER ********************************************************/
-router.get("*", (req: Request, res: Response) => {
-    res.status(404).json({
-      status: 404,
-      message: "Page not found",
-    });
-  });
-  
-  router.post("*", (req: Request, res: Response) => {
-    res.status(404).json({
-      status: 404,
-      message: "Page not found",
-    });
-  });
-  
-  router.patch("*", (req: Request, res: Response) => {
-    res.status(404).json({
-      status: 404,
-      message: "Page not found",
-    });
-  });
-  
-  router.put("*", (req: Request, res: Response) => {
-    res.status(404).json({
-      status: 404,
-      message: "Page not found",
-    });
-  });
-  
-  router.delete("*", (req: Request, res: Response) => {
-    res.status(404).json({
-      status: 404,
-      message: "Page not found",
-    });
-  });
-  
+// UNDEFINED PATH HANDLER
+router.use(undefinedPathHandler);
+
 export default router;

@@ -17,7 +17,7 @@ const createProduct = async (req: Request, res: Response) => {
       .status(201)
       .json(new ApiResponse(201, product, "Product Created Successfully"));
   } else {
-    return res.status(500).json(new ApiError(500, "Product Creation Failed"));
+    throw new ApiError(500, "Product Creation Failed");
   }
 };
 
