@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import productRouter from "./productRouter";
+import productRouter from "./product.router";
 import authRouter from "./auth.router";
 import userRouter from "./userRouter";
 
@@ -9,8 +9,8 @@ router.get("/", (req: Request, res: Response) => {
     res.send("<h1>Welcome to My E-com server</h1>");
 });
 
-router.use('/auth',authRouter);
-router.use(productRouter);
+router.use('/auth', authRouter);
+router.use('/product', productRouter);
 router.use(userRouter);
 
 /*********************************************************** UNDEFINED PATH HANDLER ********************************************************/
