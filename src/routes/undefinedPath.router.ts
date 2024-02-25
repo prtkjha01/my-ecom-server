@@ -2,6 +2,10 @@ import { Router, Request, Response } from "express";
 
 const undefinedPathHandler = Router();
 
+undefinedPathHandler.get("/", (req: Request, res: Response) => {
+  res.send("<h1>Welcome to My E-com server</h1>");
+});
+
 undefinedPathHandler.get("*", (req: Request, res: Response) => {
   res.status(404).json({
     status: 404,

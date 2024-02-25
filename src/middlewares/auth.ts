@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import userModel from "../models/userModel";
 import { Request, Response, NextFunction } from "express";
+import User from "../models/user.model";
 import ApiError from "../utils/ApiError";
 dotenv.config();
 /***************************** WITH THE SIGNTOKEN TOKEN FUNCTION WE CAN CREATE A JWT TOKEN ***************************/
@@ -47,15 +47,15 @@ export const checkAdmin = async (
   next: NextFunction
 ) => {
   try {
-    let user = await userModel.findById(req.user.userId);
-    if (user && !(user.role == "ADMIN")) {
-      return res.status(401).json({
-        success: false,
-        message: "You are not authorized to perform this operation",
-      });
-    } else {
-      next();
-    }
+    let user = await User.findById(req.user.userId);
+    // if (user && !(user.role == "ADMIN")) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "You are not authorized to perform this operation",
+    //   });
+    // } else {
+    //   next();
+    // }
   } catch (error) {
     return res.status(500).json({
       success: false,
