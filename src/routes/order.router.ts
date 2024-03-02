@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { createOrder } from "../controllers/order.controller";
+import { createOrder, handlePaymentSuccess } from "../controllers/order.controller";
 import { verifyToken } from "../middlewares/auth";
 
 const orderRouter = Router();
 
-orderRouter.post("/", verifyToken, createOrder);
-
+orderRouter.post("/", createOrder);
+orderRouter.post('/payment-success', handlePaymentSuccess)
 export default orderRouter;
