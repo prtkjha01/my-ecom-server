@@ -56,9 +56,26 @@ const getCart = async (
   if (!cart) {
     throw new ApiError(404, "Cart Not Found");
   } else {
+    const updatedProducts = cart.products.map((product: any) => ({
+      ...product.toObject(),
+      subtotal: product.product.price * product.count,
+    }));
+
+    const totalSubtotal = updatedProducts.length
+      ? updatedProducts.reduce(
+          (total, product) => total + (product.subtotal || 0),
+          0
+        )
+      : 0;
+
+    const updatedCart = {
+      ...cart.toObject(),
+      products: updatedProducts,
+      total_subtotal: totalSubtotal,
+    };
     return res
       .status(200)
-      .json(new ApiResponse(200, cart, "Cart Fetched Successfully"));
+      .json(new ApiResponse(200, updatedCart, "Cart Fetched Successfully"));
   }
 };
 
@@ -73,15 +90,17 @@ const addProducts = async (
   req: AuthorizedRequest,
   res: Response
 ): Promise<Response<any, Record<string, any>>> => {
-  const { id: cartId } = req.params;
+  const { userId } = req.user;
   const { products } = req.body;
 
   try {
-    const cart = await Cart.findById(cartId);
+    const cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
       throw new ApiError(404, "Cart Not Found");
     } else {
+      const cartId = cart._id;
+
       const updateOperations = products.map((productId: any) => ({
         updateOne: {
           filter: { _id: cartId, "products.product": productId },

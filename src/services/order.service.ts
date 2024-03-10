@@ -12,7 +12,7 @@ const createOrder = async (
   const { amount } = req.body;
   try {
     const options = {
-      amount: amount * 100, // amount in smallest currency unit
+      amount: amount * 100, // amount in smallest currency unit (paise)
       currency: "INR",
       receipt: "receipt_order_74394",
     };
