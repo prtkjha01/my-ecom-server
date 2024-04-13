@@ -27,12 +27,33 @@ export const getCart = asyncHandler(
 
 /**
   @desc    Add products to cart
-  @route   PATCH /api/v1/cart/:id/add
+  @route   PATCH /api/v1/cart/add
   @access  Private
 */
 export const addProducts = asyncHandler(
   async (req: AuthorizedRequest, res: Response) => {
     return cartService.addProducts(req, res);
+  }
+);
+
+/**
+  @desc    Update product count
+  @route   PATCH /api/v1/cart/update
+  @access  Private
+*/
+export const updateProductCount = asyncHandler(
+  async (req: AuthorizedRequest, res: Response) => {
+    return cartService.updateProductCount(req, res);
+  }
+);
+/**
+  @desc    Remove Product from cart
+  @route   PATCH /api/v1/cart/remove/:id
+  @access  Private
+*/
+export const removeProduct = asyncHandler(
+  async (req: AuthorizedRequest, res: Response) => {
+    return cartService.removeProduct(req, res);
   }
 );
 

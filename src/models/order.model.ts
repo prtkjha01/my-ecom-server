@@ -40,6 +40,10 @@ const UserSchema = new Schema(
       enum: ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"],
       default: "PLACED",
     },
+    razorpay_data: {
+      type: Object,
+      default: null,
+    },
 
     expected_delivery_date: {
       type: Date,

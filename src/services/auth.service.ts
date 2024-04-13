@@ -8,49 +8,64 @@ import otpGenerator from "otp-generator";
 import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
 // import { User } from "../interfaces/userInterface";
-import User from '../models/user.model'
-import asyncHandler from '../utils/asyncHandler'
-import ApiResponse from '../utils/ApiResponse'
-import ApiError from '../utils/ApiError'
+import User from "../models/user.model";
+import asyncHandler from "../utils/asyncHandler";
+import ApiResponse from "../utils/ApiResponse";
+import ApiError from "../utils/ApiError";
+import { google, verifyGoogleToken } from "../utils/google";
+import { log } from "console";
 const register = async (req: Request, res: Response) => {
+  const { name, email, mobile, password } = req.body;
 
-  const {name, email, mobile, password} = req.body
+  const existingUser = await User.findOne({ email });
 
-  const existingUser = await User.findOne({email})
+  if (existingUser)
+    throw new ApiError(409, "User with same email already exists!");
 
-  if(existingUser)  throw new ApiError(409, "User with same email already exists!")
-  
-  const hashedPwd = await bcrypt.hash(password, 10)
-  const newUser = new User({name, email, mobile, password: hashedPwd})
-  await newUser.save()
+  const hashedPwd = await bcrypt.hash(password, 10);
+  const newUser = new User({ name, email, mobile, password: hashedPwd });
+  await newUser.save();
 
-    return res.status(201).json(
-      new ApiResponse(201, {}, "User Registered Successfully")
-    )    
-}
+  return res
+    .status(201)
+    .json(new ApiResponse(201, {}, "User Registered Successfully"));
+};
 
 const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-  const {email, password} = req.body 
+  const existingUser = await User.findOne({ email });
 
-  const existingUser = await User.findOne({email})
+  if (!existingUser) throw new ApiError(404, "User not found!");
 
-  if(!existingUser) throw new ApiError(404, "User not found!")
+  const isPasswordCorrect = await bcrypt.compare(
+    password,
+    existingUser.password
+  );
 
-  const isPasswordCorrect = await bcrypt.compare(password, existingUser.password)
+  if (!isPasswordCorrect) throw new ApiError(401, " Incorrect Password");
 
-  if(!isPasswordCorrect) throw new ApiError(401, " Incorrect Password")
+  const token = signToken(existingUser);
 
-  const token = signToken(existingUser)
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { token }, "User Logged In Successfully"));
+};
 
-  return res.status(200).json(
-    new ApiResponse(200, {token}, "User Logged In Successfully")
-  )
-}
+const loginWithGoogle = async (req: Request, res: Response) => {
+  try {
+    if (req.body?.credential) {
+      const verificationResponse: any = verifyGoogleToken(req.body.credential);
+      const profile = verificationResponse?.payload;
+      console.log(profile);
+    }
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
 
-const signup = async (req: Request, res: Response) => {
-  
-}
+const googleRedirect = async (req: Request, res: Response) => {};
+const signup = async (req: Request, res: Response) => {};
 
 // const signup = async (req: Request, res: Response) => {
 //   try {
@@ -141,4 +156,4 @@ const signup = async (req: Request, res: Response) => {
 //   }
 // };
 
-export default { register, signup, login };
+export default { register, signup, login, loginWithGoogle };

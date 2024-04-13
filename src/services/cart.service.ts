@@ -129,6 +129,56 @@ const addProducts = async (
     throw new ApiError(error.statusCode, error.message);
   }
 };
+const updateProductCount = async (req: AuthorizedRequest, res: Response) => {
+  const { userId } = req.user;
+  const { id: productId } = req.params;
+  const { count } = req.body;
+  const cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    throw new ApiError(404, "Cart Not Found");
+  } else {
+    cart.products = cart.products.map((product: any) => {
+      if (product.product.toString() === productId) {
+        product.count = count;
+      }
+      return product;
+    });
+    await cart.save();
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Product Count Updated Successfully"));
+  }
+};
+/**
+ * Deletes specified product from the user's cart if it exists, and returns a success message if the deletion is successful. Throws an error if the cart does not exist or if there is an error during the deletion process.
+ *
+ * @param {AuthorizedRequest} req - the authorized request object
+ * @param {Response} res - the response object
+ * @return {Promise<Response<any, Record<string, any>>>} - a promise that resolves with the result of the deletion process
+ */
+const removeProduct = async (
+  req: AuthorizedRequest,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
+  const { userId } = req.user;
+  const { id: productId } = req.params;
+
+  try {
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      throw new ApiError(404, "Cart Not Found !");
+    } else {
+      cart.products = cart.products.filter(
+        (product: any) => product.product.toString() !== productId
+      );
+      await cart.save();
+
+      return res.status(200).json(new ApiResponse(200, {}, "Product Removed!"));
+    }
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
 
 /**
  * Deletes the user's cart if it exists, and returns a success message if the deletion is successful. Throws an error if the cart does not exist or if there is an error during the deletion process.
@@ -162,5 +212,7 @@ export default {
   createCart,
   getCart,
   addProducts,
+  updateProductCount,
+  removeProduct,
   deleteCart,
 };
