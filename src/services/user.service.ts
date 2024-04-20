@@ -1,3 +1,23 @@
+import { Request, Response } from "express";
+import { AuthorizedRequest } from "../interfaces/userInterface";
+import User from "../models/user.model";
+import ApiResponse from "../utils/ApiResponse";
+import ApiError from "../utils/ApiError";
+const getUser = async (req: AuthorizedRequest, res: Response) => {
+  const { userId: id } = req.user;
+  const user = await User.findById(id);
+  if (user) {
+    return res
+      .status(201)
+      .json(new ApiResponse(201, user, "User Fetched Successfully"));
+  } else {
+    throw new ApiError(500, "User Not Found");
+  }
+};
+
+export default {
+  getUser,
+};
 // import bcrypt from "bcryptjs";
 // import userModel from "../models/userModel";
 // import { Request, Response } from "express";

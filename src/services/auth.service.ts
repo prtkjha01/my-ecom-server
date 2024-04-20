@@ -14,6 +14,7 @@ import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
 import { google, verifyGoogleToken } from "../utils/google";
 import { log } from "console";
+import Cart from "../models/cart.model";
 const register = async (req: Request, res: Response) => {
   const { name, email, mobile, password } = req.body;
 
@@ -22,13 +23,18 @@ const register = async (req: Request, res: Response) => {
   if (existingUser)
     throw new ApiError(409, "User with same email already exists!");
 
-  const hashedPwd = await bcrypt.hash(password, 10);
-  const newUser = new User({ name, email, mobile, password: hashedPwd });
-  await newUser.save();
-
-  return res
-    .status(201)
-    .json(new ApiResponse(201, {}, "User Registered Successfully"));
+  try {
+    const hashedPwd = await bcrypt.hash(password, 10);
+    const newUser = new User({ name, email, mobile, password: hashedPwd });
+    await newUser.save();
+    const newCart = new Cart({ user: newUser._id });
+    await newCart.save();
+    return res
+      .status(201)
+      .json(new ApiResponse(201, {}, "User Registered Successfully"));
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
 };
 
 const login = async (req: Request, res: Response) => {

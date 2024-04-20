@@ -17,23 +17,50 @@ const createProduct = async (req: Request, res: Response) => {
 };
 
 const getAllProducts = async (req: Request, res: Response) => {
-  const { query, page = 1, limit = 10 }: any = req.query;
-  const { min_price, max_price, discount, is_assured } = req.body || {};
+  const {
+    query,
+    page = 1,
+    limit = 10,
+    is_assured,
+    min_price,
+    max_price,
+    min_discount,
+    max_discount,
+  }: any = req.query;
 
-  const priceFilter: any = {};
-  if (min_price !== undefined) {
-    priceFilter.$gte = Number(min_price);
-  }
-  if (max_price !== undefined) {
-    priceFilter.$lte = Number(max_price);
-  }
-
-  const products = await Product.find({
+  let dbQuery: any = {
     $or: [
       { product_name: { $regex: new RegExp(query, "i") } },
       { brand: { $regex: new RegExp(query, "i") } },
     ],
-  })
+  };
+  let andQuery: any = [];
+
+  if (min_price && max_price) {
+    andQuery.push({
+      price: {
+        $gte: Number(min_price),
+        $lte: Number(max_price),
+      },
+    });
+  }
+  if (min_discount && max_discount) {
+    andQuery.push({
+      discount: {
+        $gte: Number(min_discount),
+        $lte: Number(max_discount),
+      },
+    });
+  }
+  if (is_assured !== undefined) {
+    andQuery.push({
+      is_assured: is_assured.toLowerCase() == "true",
+    });
+  }
+  if (andQuery.length) {
+    dbQuery["$and"] = andQuery;
+  }
+  const products = await Product.find(dbQuery)
     .skip(limit * (page - 1))
     .limit(limit)
     .sort("created_at");

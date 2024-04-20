@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 var Schema = mongoose.Schema;
-const UserSchema = new Schema(
+const OrderSchema = new Schema(
   {
     products: {
       type: [
@@ -40,8 +40,13 @@ const UserSchema = new Schema(
       enum: ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"],
       default: "PLACED",
     },
+    total: {
+      type: Number,
+      default: 0,
+    },
     razorpay_data: {
       type: Object,
+      required: false,
       default: null,
     },
 
@@ -55,6 +60,6 @@ const UserSchema = new Schema(
   }
 );
 
-const User = mongoose.model("User", UserSchema);
+const Order = mongoose.model("Order", OrderSchema);
 
-export default User;
+export default Order;

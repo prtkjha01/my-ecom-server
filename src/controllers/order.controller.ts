@@ -13,7 +13,7 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const handlePaymentSuccess = asyncHandler(
-  async (req: Request, res: Response) => {
+  async (req: AuthorizedRequest, res: Response) => {
     return orderService.handlePaymentSuccess(req, res);
   }
 );

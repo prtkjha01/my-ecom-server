@@ -4,6 +4,7 @@ import Order from "../models/order.model";
 import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
 import razorpay from "../utils/razorpay";
+import cartService from "./cart.service";
 
 const createOrder = async (
   req: Request,
@@ -29,12 +30,24 @@ const createOrder = async (
   }
 };
 
-const handlePaymentSuccess = async (req: Request, res: Response) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.body, "Payment Successfull"));
+const handlePaymentSuccess = async (req: AuthorizedRequest, res: Response) => {
+  const { userId } = req.user;
+  const order = new Order({ user: userId, ...req.body });
+  await order.save();
+  if (order) {
+    try {
+      await cartService.deleteCart(req, res);
+      await cartService.createCart(req, res);
+      return res
+        .status(201)
+        .json(new ApiResponse(201, order, "Order Created Successfully"));
+    } catch (error: any) {
+      throw new ApiError(error.statusCode, error.message);
+    }
+  } else {
+    throw new ApiError(500, "Order Creation Failed");
+  }
 };
-
 export default {
   createOrder,
   handlePaymentSuccess,

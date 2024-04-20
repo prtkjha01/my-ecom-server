@@ -1,6 +1,11 @@
-// import { Router } from "express";
-// import { verifyToken, checkAdmin } from "../middlewares/auth";
+import { Router } from "express";
+import { verifyToken, checkAdmin } from "../middlewares/auth";
+import { getUser } from "../controllers/user.controller";
 
+const userRouter = Router();
+
+userRouter.get("/current", verifyToken, getUser);
+export default userRouter;
 // import {
 //   getAll,
 //   deleteUser,
