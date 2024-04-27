@@ -19,8 +19,8 @@ const createProduct = async (req: Request, res: Response) => {
 const getAllProducts = async (req: Request, res: Response) => {
   const {
     query,
-    page = 1,
-    limit = 10,
+    page,
+    limit,
     is_assured,
     min_price,
     max_price,
@@ -124,7 +124,7 @@ const getProductByCategory = async (req: Request, res: Response) => {
 
   if (!products) throw new ApiError(404, "Products Not Found");
 
-  const total = Math.ceil(await Product.countDocuments());
+  const total = Math.ceil(await Product.countDocuments({ category }));
 
   if (!products.length) {
     return res.status(200).json(
@@ -159,9 +159,36 @@ const getProductByCategory = async (req: Request, res: Response) => {
   );
 };
 
+const getCarouselProducts = async (req: Request, res: Response) => {
+  try {
+    const carouselProducts = await Product.aggregate([
+      {
+        $sort: { rating: -1 },
+      },
+      {
+        $limit: 6,
+      },
+      {
+        $project: {
+          _id: 1,
+          images: 1,
+        },
+      },
+    ]);
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, carouselProducts, "Products Fetched Successfully")
+      );
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
 export default {
   createProduct,
   getAllProducts,
   getProductById,
   getProductByCategory,
+  getCarouselProducts,
 };

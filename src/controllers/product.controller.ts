@@ -25,3 +25,9 @@ export const getProductByCategory = asyncHandler(
     return productService.getProductByCategory(req, res);
   }
 );
+
+export const getCarouselProducts = asyncHandler(
+  async (req: Request, res: Response) => {
+    return productService.getCarouselProducts(req, res);
+  }
+);
