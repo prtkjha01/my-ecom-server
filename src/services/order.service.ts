@@ -57,7 +57,8 @@ const getAllOrders = async (req: AuthorizedRequest, res: Response) => {
         path: "products.product",
         select: "-created_at -updated_at -specifications -faqs -reviews",
       })
-      .select("-created_at -updated_at");
+      .select("-created_at -updated_at")
+      .sort({ created_at: -1 });
     if (!orders) throw new ApiError(404, "No Orders Found");
     return res
       .status(200)
