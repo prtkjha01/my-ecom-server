@@ -49,7 +49,7 @@ const login = async (req: Request, res: Response) => {
     existingUser.password
   );
 
-  if (!isPasswordCorrect) throw new ApiError(401, " Incorrect Password");
+  if (!isPasswordCorrect) throw new ApiError(401, "Incorrect Password");
 
   const token = signToken(existingUser);
 
