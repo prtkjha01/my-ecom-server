@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { signToken } from "../middlewares/auth";
 import { Request, Response } from "express";
-import sendMail from "../utils/mail";
+import { sendMail, sendMailWithTemplate } from "../utils/mail";
 import cache from "../utils/cache";
 import otpGenerator from "otp-generator";
 import User from "../models/user.model";
@@ -78,8 +78,11 @@ const sendOTP = async (req: Request, res: Response) => {
     const subject = "My Ecom OTP";
     const html = "Your OTP is :" + otp;
 
-    await sendMail(email, subject, html);
-
+    // await sendMail(email, subject, html);
+    await sendMailWithTemplate(email, subject, "sendOtp.template", {
+      otp,
+      name: user.name,
+    });
     cache.set(email, otp, 600);
 
     return res
