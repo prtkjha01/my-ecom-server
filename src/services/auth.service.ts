@@ -1,19 +1,13 @@
-import * as dotenv from "dotenv";
 import bcrypt from "bcryptjs";
-// import userModel from "../models/userModel";
 import { signToken } from "../middlewares/auth";
 import { Request, Response } from "express";
 import sendMail from "../utils/mail";
+import cache from "../utils/cache";
 import otpGenerator from "otp-generator";
-import OtpModel from "../models/otpModel";
-import mongoose from "mongoose";
-// import { User } from "../interfaces/userInterface";
 import User from "../models/user.model";
-import asyncHandler from "../utils/asyncHandler";
 import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
 import { google, verifyGoogleToken } from "../utils/google";
-import { log } from "console";
 import Cart from "../models/cart.model";
 const register = async (req: Request, res: Response) => {
   const { name, email, mobile, password } = req.body;
@@ -70,96 +64,85 @@ const loginWithGoogle = async (req: Request, res: Response) => {
   }
 };
 
+const sendOTP = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const otp = otpGenerator.generate(6, {
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    const user = await User.findOne({ email });
+    if (!user) throw new ApiError(404, "User not found!");
+    const subject = "My Ecom OTP";
+    const html = "Your OTP is :" + otp;
+
+    await sendMail(email, subject, html);
+
+    cache.set(email, otp, 600);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Otp sent successfully !"));
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
+
+const verifyOTP = async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) throw new ApiError(404, "User not found!");
+
+    if (cache.get(email) === otp) {
+      cache.del(email);
+      return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Otp verified successfully !"));
+    } else {
+      throw new ApiError(401, "Incorrect OTP !");
+    }
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
+
+const resetPassword = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(404, "User not found!");
+
+  try {
+    const isSamePassword = await bcrypt.compare(password, user.password);
+
+    if (isSamePassword) {
+      throw new ApiError(409, "New password cannot be same as old password");
+    } else {
+      const hashedPwd = await bcrypt.hash(password, 10);
+
+      user.password = hashedPwd;
+
+      await user.save();
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Password reset successfully !"));
+    }
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
+
 const googleRedirect = async (req: Request, res: Response) => {};
-const signup = async (req: Request, res: Response) => {};
 
-// const signup = async (req: Request, res: Response) => {
-//   try {
-//     const existingUser = await userModel.findOne({ email: req.body.email }); // CHECKS FOR THE EXISTING USER IN OUR DATABASE
-//     if (existingUser) {
-//       return res.status(400).json({
-//         status: 400,
-//         message: "Account Already exists",
-//       });
-//     } else if (
-//       req.body.name.length === 0 ||
-//       req.body.age < 1 ||
-//       req.body.email.includes("@") === false
-//     ) {
-//       return res.status(400).json({
-//         status: 400,
-//         message: "incorrect credentials",
-//       });
-//     }
-//     const newUser = new userModel(req.body); // CRETATED NEW INSTANCE OF USER
-//     const hashedPwd = await bcrypt.hash(req.body.password, 10); // CONFIGURED BCRYPT HASH METHOD TO STORE PASSWORD IN DATABAS EAFTER ENCODING
-//     newUser.password = hashedPwd;
-//     newUser.createdAt = new Date();
-//     //return new Date()
-//     // let otp = otpGenerate()
-//     // let mobile = req.body.mobile;
-//     // await sendMsg(mobile, otp)
-//     let token = signToken(newUser); // CALLING SIGNTOKEN FUNCTION TO HAVE A JWT FOR THIS PARTICULAR USER
-//     await newUser.save(); // AFTER CREATING THE USER, SAVE THAT USER IN OUR DATABASE
-//     return res.status(201).json({
-//       success: true,
-//       data: {
-//         userId: newUser.id,
-//         email: newUser.email,
-//         token: token,
-//         createdAt: newUser.createdAt,
-//       },
-//     });
-//   } catch (err: any) {
-//     return res.status(500).json({
-//       message: err.message,
-//     });
-//   }
-// };
-
-// const login = async (req: Request, res: Response) => {
-//   try {
-//     let { email, password } = req.body;
-//     let existingUser = await userModel.findOne({ email: email }); //CHECKS FOR THE EXISTING USER IN OUR DATABASE
-//     if (!existingUser) {
-//       return res.status(404).json({
-//         status: 404,
-//         message: "Wrong email or password",
-//       });
-//     }
-//     if (!email || !password) {
-//       return res.status(400).json({
-//         status: 400,
-//         message: "Please provide all details i.e. email and password",
-//       });
-//     }
-//     let token = signToken(existingUser); // CALLING SIGNTOKEN FUNCTION TO HAVE A JWT FOR THIS PARTICULAR USER
-//     if (existingUser) {
-//       const cmp = await bcrypt.compare(password, existingUser.password); // CHECKS FOR THE PASSWORD IS THAT IS CORRECT OR NOT BY USING BCRYPT COMPARE METHOD
-//       if (cmp) {
-//         return res.status(200).json({
-//           success: true,
-//           data: {
-//             status: 200,
-//             message: "User login successful",
-//             userId: existingUser.id,
-//             email: existingUser.email,
-//             token: token,
-//           },
-//         });
-//       } else {
-//         return res.status(403).json({
-//           status: 403,
-//           message: "Wrong Password",
-//         });
-//       }
-//     }
-//   } catch (err) {
-//     return res.status(500).json({
-//       status: 500,
-//       message: "Error! Something went wrong",
-//     });
-//   }
-// };
-
-export default { register, signup, login, loginWithGoogle };
+export default {
+  register,
+  login,
+  loginWithGoogle,
+  sendOTP,
+  verifyOTP,
+  resetPassword,
+};

@@ -15,3 +15,17 @@ export const loginWithGoogle = asyncHandler(
     return authService.loginWithGoogle(req, res);
   }
 );
+
+export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
+  return authService.sendOTP(req, res);
+});
+
+export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
+  return authService.verifyOTP(req, res);
+});
+
+export const resetPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    return authService.resetPassword(req, res);
+  }
+);

@@ -1,35 +1,23 @@
 import nodemailer from "nodemailer";
 
-const sendMail = async (email: any, param: string) => {
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "myecom931@gmail.com",
-      pass: "lwacxrcqmskljlsv",
-    },
-  });
+const transporter = nodemailer.createTransport({
+  secure: true,
+  host: "smtp.gmail.com",
+  port: 465,
+  auth: {
+    user: "noreply.myecom@gmail.com",
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
-  let mailOptions = {
-    from: '"My Ecom" <myecom931@gmail.com>',
-    to: email,
-    subject: "Your order has been successfully placed ✔",
-    text: "Order has been placed",
-    html: "<b>Thanks for Ordering from us</b>",
+const sendMail = async (to: string, subject: string, html: string) => {
+  const mailOptions = {
+    from: '"My Ecom" <noreply.myecom@gmail.com>',
+    to,
+    subject,
+    html,
   };
-
-  let otpMail = {
-    from: '"My Ecom" <myecom931@gmail.com>',
-    to: email,
-    subject: "OTP for My E-com",
-    text: "OTP for My E-com",
-    html: `<b>Your OTP for my E-com is ${param}</b>`,
-  };
-
-  transporter.sendMail(param ? otpMail : mailOptions, (error) => {
-    if (error) {
-      return console.log(error.message);
-    }
-  });
+  await transporter.sendMail(mailOptions);
 };
 
 export default sendMail;
