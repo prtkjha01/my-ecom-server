@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to My Ecom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #dddddd;
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #dddddd;
+        }
+        .brand-image {
+            height: 4rem;
+            width: 4rem;
+        }
+        .header h1 {
+            margin: 0;
+            color: #3a003d;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .content p {
+            font-size: 13px;
+            color: #666666;
+        }
+        .welcome {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3a003d;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 5px 0;
+            font-size: 12px;
+            border-top: 1px solid #dddddd;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img class="brand-image" src="https://res.cloudinary.com/debwkutxb/image/upload/v1722239665/my-ecom/ah30cob3jtnspais47yp.png" alt="brand-image">
+            <h1>Thanks for signing up 🤝</h1>
+        </div>
+        <div class="content">
+            <p>Dear <%= name %>,</p>
+            <div class="welcome">Welcome to My Ecom!</div>
+            <p>We are thrilled to have you on board. Your registration was successful, and you can now explore all the features and products we offer.</p>
+            <p>Feel free to browse through our wide range of products, and don't hesitate to reach out to our support team if you have any questions.</p>
+            <p>Thank you for joining us, and we look forward to serving you.</p>
+            <p>Best regards,</p>
+            <p>My Ecom</p>
+        </div>
+        <div class="footer">
+            <p>If you did not register for this account, please contact our support team immediately.</p>
+        </div>
+    </div>
+</body>
+</html>
