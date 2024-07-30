@@ -37,7 +37,7 @@
             padding: 20px 0;
         }
         .content p {
-            font-size: 16px;
+            font-size: 13px;
             color: #666666;
         }
         .otp {
@@ -50,6 +50,7 @@
         .footer {
             text-align: center;
             padding: 5px 0;
+            font-size: 12px;
             border-top: 1px solid #dddddd;
             color: #999999;
         }
@@ -59,13 +60,13 @@
     <div class="container">
         <div class="header">
             <img class="brand-image" src="https://res.cloudinary.com/debwkutxb/image/upload/v1722239665/my-ecom/ah30cob3jtnspais47yp.png" alt="brand-image">
-            <h1>Verify Your Email</h1>
+            <h1>Email Confirmation</h1>
         </div>
         <div class="content">
             <p>Dear <%= name %>,</p>
             <p>Your One-Time Password (OTP) for verifying your account is:</p>
             <div class="otp"><%= otp %></div>
-            <p>Please enter this OTP to complete your verification process. This OTP is valid for the next 10 minutes.</p>
+            <p>Please enter this OTP to complete your verification process. This OTP is valid for the next 10 minutes. </p>
             <p>Thank you,</p>
             <p>My Ecom</p>
         </div>

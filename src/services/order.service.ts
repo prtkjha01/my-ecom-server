@@ -67,6 +67,40 @@ const getAllOrders = async (req: AuthorizedRequest, res: Response) => {
     throw new ApiError(error.statusCode, error.message);
   }
 };
+
+export const updateOrderStatus = async () => {
+  try {
+    // Get current date and time
+    const now = new Date();
+
+    // Calculate date for 1 day ago and 2 days ago
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+
+    // Update status to 'SHIPPED' for orders created more than 1 day ago and not yet shipped
+    await Order.updateMany(
+      {
+        status: "PLACED",
+        created_at: { $lte: oneDayAgo },
+      },
+      { $set: { status: "SHIPPED" } }
+    );
+
+    // Update status to 'DELIVERED' for orders created more than 2 days ago and not yet delivered
+    await Order.updateMany(
+      {
+        status: "SHIPPED",
+        created_at: { $lte: twoDaysAgo },
+      },
+      { $set: { status: "DELIVERED" } }
+    );
+
+    console.log("Order statuses updated successfully");
+  } catch (error: any) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
+
 export default {
   createOrder,
   handlePaymentSuccess,
