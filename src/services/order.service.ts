@@ -5,6 +5,7 @@ import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
 import razorpay from "../utils/razorpay";
 import cartService from "./cart.service";
+import { sendMailWithTemplate } from "../utils/mail";
 
 const createOrder = async (
   req: Request,
@@ -31,11 +32,12 @@ const createOrder = async (
 };
 
 const handlePaymentSuccess = async (req: AuthorizedRequest, res: Response) => {
-  const { userId } = req.user;
+  const { userId, email } = req.user;
   const order = new Order({ user: userId, ...req.body });
   await order.save();
   if (order) {
     try {
+      sendOrderEmail(String(order._id), email);
       await cartService.deleteCart(req, res);
       await cartService.createCart(req, res);
       return res
@@ -46,6 +48,42 @@ const handlePaymentSuccess = async (req: AuthorizedRequest, res: Response) => {
     }
   } else {
     throw new ApiError(500, "Order Creation Failed");
+  }
+};
+
+const sendOrderEmail = async (orderId: string, email: string) => {
+  const order = (await Order.findById(orderId)
+    .populate({
+      path: "products.product",
+      select: "-created_at -updated_at -specifications -faqs -reviews",
+    })
+    .populate({
+      path: "user",
+      select: "name email",
+    })
+    .populate({
+      path: "address",
+      select: "address_line_1 address_line_2 city state pincode",
+    })) as any;
+
+  if (!order) {
+    throw new ApiError(404, "Order Not Found");
+  } else {
+    sendMailWithTemplate(
+      email,
+      `Your Order(${order._id || ""}) has been placed successfully`,
+      "orderPlaced.template",
+      {
+        name: order?.user?.name || "--",
+        orderId: order?._id || "--",
+        orderDate: order?.created_at,
+        products: order?.products || [],
+        total: order?.total || 0,
+        address: `${order?.address?.address_line_1 || ""}, ${
+          order?.address?.address_line_2 || ""
+        }, ${order?.address?.city || ""}, ${order?.address?.state || ""}`,
+      }
+    );
   }
 };
 

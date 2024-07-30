@@ -23,6 +23,12 @@ const register = async (req: Request, res: Response) => {
     await newUser.save();
     const newCart = new Cart({ user: newUser._id });
     await newCart.save();
+    await sendMailWithTemplate(
+      email,
+      "Thanks for signing up with My Ecom",
+      "welcome.template",
+      { name }
+    );
     return res
       .status(201)
       .json(new ApiResponse(201, {}, "User Registered Successfully"));
