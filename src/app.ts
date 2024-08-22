@@ -1,6 +1,5 @@
-import express, { urlencoded } from "express";
+import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import router from "../src/routes/router";
 import errorHandler from "./middlewares/error";
 const app = express();

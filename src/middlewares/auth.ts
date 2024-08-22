@@ -40,26 +40,3 @@ export const verifyToken = (
     });
   }
 };
-
-export const checkAdmin = async (
-  req: User,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    let user = await User.findById(req.user.userId);
-    // if (user && !(user.role == "ADMIN")) {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "You are not authorized to perform this operation",
-    //   });
-    // } else {
-    //   next();
-    // }
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-    });
-  }
-};

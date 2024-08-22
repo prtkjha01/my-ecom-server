@@ -6,7 +6,6 @@ import {
   getProductByCategory,
   getCarouselProducts,
 } from "../controllers/product.controller";
-import { checkAdmin, verifyToken } from "../middlewares/auth";
 
 const productRouter = Router();
 

@@ -84,11 +84,11 @@ const sendOTP = async (req: Request, res: Response) => {
     const subject = "My Ecom OTP";
     const html = "Your OTP is :" + otp;
 
-    // await sendMail(email, subject, html);
     await sendMailWithTemplate(email, subject, "sendOtp.template", {
       otp,
       name: user.name,
     });
+
     cache.set(email, otp, 600);
 
     return res

@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { verifyToken, checkAdmin } from "../middlewares/auth";
 import {
   register,
   login,
