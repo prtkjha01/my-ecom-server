@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, query } from "express";
+import { Request, Response } from "express";
 import { AuthorizedRequest } from "../interfaces/userInterface";
 import Order from "../models/order.model";
 import ApiResponse from "../utils/ApiResponse";
@@ -7,6 +7,14 @@ import razorpay from "../utils/razorpay";
 import cartService from "./cart.service";
 import { sendMailWithTemplate } from "../utils/mail";
 
+/**
+ * Creates a new order using Razorpay.
+ *
+ * @param {Request} req - The incoming HTTP request.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response.
+ * @throws {ApiError} If there is an error with Razorpay or order creation fails.
+ */
 const createOrder = async (
   req: Request,
   res: Response
@@ -31,7 +39,18 @@ const createOrder = async (
   }
 };
 
-const handlePaymentSuccess = async (req: AuthorizedRequest, res: Response) => {
+/**
+ * Handles payment success by saving the order and clearing the user's cart.
+ *
+ * @param {AuthorizedRequest} req - The incoming HTTP request, containing user info.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response.
+ * @throws {ApiError} If order creation fails or an error occurs while sending the email or clearing the cart.
+ */
+const handlePaymentSuccess = async (
+  req: AuthorizedRequest,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { userId, email } = req.user;
   const order = new Order({ user: userId, ...req.body });
   await order.save();
@@ -51,7 +70,18 @@ const handlePaymentSuccess = async (req: AuthorizedRequest, res: Response) => {
   }
 };
 
-const sendOrderEmail = async (orderId: string, email: string) => {
+/**
+ * Sends an order confirmation email to the user.
+ *
+ * @param {string} orderId - The ID of the order.
+ * @param {string} email - The email address to send the confirmation to.
+ * @return {Promise<void>} A promise resolving when the email is sent.
+ * @throws {ApiError} If the order is not found or an error occurs while sending the email.
+ */
+const sendOrderEmail = async (
+  orderId: string,
+  email: string
+): Promise<void> => {
   const order = (await Order.findById(orderId)
     .populate({
       path: "products.product",
@@ -87,7 +117,18 @@ const sendOrderEmail = async (orderId: string, email: string) => {
   }
 };
 
-const getAllOrders = async (req: AuthorizedRequest, res: Response) => {
+/**
+ * Retrieves all orders for the authenticated user.
+ *
+ * @param {AuthorizedRequest} req - The incoming HTTP request, containing user info.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response.
+ * @throws {ApiError} If no orders are found or an error occurs while retrieving orders.
+ */
+const getAllOrders = async (
+  req: AuthorizedRequest,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { userId } = req.user;
   try {
     const orders = await Order.find({ user: userId })
@@ -106,7 +147,13 @@ const getAllOrders = async (req: AuthorizedRequest, res: Response) => {
   }
 };
 
-export const updateOrderStatus = async () => {
+/**
+ * Updates the status of orders based on their creation date.
+ *
+ * @return {Promise<void>} A promise resolving when the order statuses are updated.
+ * @throws {ApiError} If an error occurs while updating the order statuses.
+ */
+export const updateOrderStatus = async (): Promise<void> => {
   try {
     // Get current date and time
     const now = new Date();

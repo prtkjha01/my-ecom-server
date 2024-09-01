@@ -6,4 +6,5 @@ const userRouter = Router();
 
 userRouter.get("/current", verifyToken, getUser);
 userRouter.post("/subscribe-to-newsletter", subscribeToNewsletter);
+
 export default userRouter;

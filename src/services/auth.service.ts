@@ -1,15 +1,26 @@
 import bcrypt from "bcryptjs";
 import { signToken } from "../middlewares/auth";
 import { Request, Response } from "express";
-import { sendMail, sendMailWithTemplate } from "../utils/mail";
+import { sendMailWithTemplate } from "../utils/mail";
 import cache from "../utils/cache";
 import otpGenerator from "otp-generator";
 import User from "../models/user.model";
 import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
-import { google, verifyGoogleToken } from "../utils/google";
+import { verifyGoogleToken } from "../utils/google";
 import Cart from "../models/cart.model";
-const register = async (req: Request, res: Response) => {
+
+/**
+  @desc    Register a new user
+  @param   {Request} req - The request object containing user data
+  @param   {Response} res - The response object used to send the response back to the client
+  @returns {Promise<Response<any, Record<string, any>>>}
+  @throws  {ApiError} If a user with the same email already exists or any other error occurs
+*/
+const register = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { name, email, mobile, password } = req.body;
 
   const existingUser = await User.findOne({ email });
@@ -37,7 +48,17 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-const login = async (req: Request, res: Response) => {
+/**
+  @desc    Log in a user
+  @param   {Request} req - The request object containing email and password
+  @param   {Response} res - The response object used to send the response back to the client
+  @returns {Promise<Response<any, Record<string, any>>>}
+  @throws  {ApiError} If the user is not found or the password is incorrect
+*/
+const login = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { email, password } = req.body;
 
   const existingUser = await User.findOne({ email });
@@ -58,7 +79,14 @@ const login = async (req: Request, res: Response) => {
     .json(new ApiResponse(200, { token }, "User Logged In Successfully"));
 };
 
-const loginWithGoogle = async (req: Request, res: Response) => {
+/**
+  @desc    Log in a user with Google
+  @param   {Request} req - The request object containing Google credentials
+  @param   {Response} res - The response object used to send the response back to the client
+  @returns {Promise<void>}
+  @throws  {ApiError} If an error occurs during the Google login process
+*/
+const loginWithGoogle = async (req: Request, res: Response): Promise<void> => {
   try {
     if (req.body?.credential) {
       const verificationResponse: any = verifyGoogleToken(req.body.credential);
@@ -70,7 +98,17 @@ const loginWithGoogle = async (req: Request, res: Response) => {
   }
 };
 
-const sendOTP = async (req: Request, res: Response) => {
+/**
+  @desc    Send OTP for verification
+  @param   {Request} req - The request object containing the user's email
+  @param   {Response} res - The response object used to send the response back to the client
+  @returns {Promise<Response<any, Record<string, any>>>}
+  @throws  {ApiError} If the user is not found or any other error occurs
+*/
+const sendOTP = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.body;
   try {
     const otp = otpGenerator.generate(6, {
@@ -82,7 +120,6 @@ const sendOTP = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
     if (!user) throw new ApiError(404, "User not found!");
     const subject = "My Ecom OTP";
-    const html = "Your OTP is :" + otp;
 
     await sendMailWithTemplate(email, subject, "sendOtp.template", {
       otp,
@@ -99,7 +136,17 @@ const sendOTP = async (req: Request, res: Response) => {
   }
 };
 
-const verifyOTP = async (req: Request, res: Response) => {
+/**
+  @desc    Verify the OTP
+  @param   {Request} req - The request object containing the user's email and OTP
+  @param   {Response} res - The response object used to send the response back to the client
+  @returns {Promise<Response<any, Record<string, any>>>}
+  @throws  {ApiError} If the OTP is incorrect or any other error occurs
+*/
+const verifyOTP = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { email, otp } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -118,7 +165,17 @@ const verifyOTP = async (req: Request, res: Response) => {
   }
 };
 
-const resetPassword = async (req: Request, res: Response) => {
+/**
+  @desc    Reset the user's password
+  @param   {Request} req - The request object containing the user's email and new password
+  @param   {Response} res - The response object used to send the response back to the client
+  @returns {Promise<Response<any, Record<string, any>>>}
+  @throws  {ApiError} If the user is not found or the new password is the same as the old password
+*/
+const resetPassword = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -144,8 +201,6 @@ const resetPassword = async (req: Request, res: Response) => {
     throw new ApiError(error.statusCode, error.message);
   }
 };
-
-const googleRedirect = async (req: Request, res: Response) => {};
 
 export default {
   register,

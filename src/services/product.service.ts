@@ -3,7 +3,18 @@ import Product from "../models/product.model";
 import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
 
-const createProduct = async (req: Request, res: Response) => {
+/**
+ * Creates a new product in the database.
+ *
+ * @param {Request} req - The incoming HTTP request containing product data.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response with the created product.
+ * @throws {ApiError} If product creation fails.
+ */
+const createProduct = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const product = new Product(req.body);
   await product.save();
 
@@ -16,7 +27,18 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-const getAllProducts = async (req: Request, res: Response) => {
+/**
+ * Retrieves all products with optional filters, sorting, and pagination.
+ *
+ * @param {Request} req - The incoming HTTP request containing query parameters for filters, pagination, and sorting.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response with the list of products.
+ * @throws {ApiError} If no products are found.
+ */
+const getAllProducts = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const {
     query,
     page,
@@ -102,7 +124,18 @@ const getAllProducts = async (req: Request, res: Response) => {
   );
 };
 
-const getProductById = async (req: Request, res: Response) => {
+/**
+ * Retrieves a single product by its ID.
+ *
+ * @param {Request} req - The incoming HTTP request containing the product ID in params.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response with the product data.
+ * @throws {ApiError} If the product is not found.
+ */
+const getProductById = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { id } = req.params;
   const product = await Product.findById(id).select("-created_at -updated_at");
 
@@ -113,7 +146,18 @@ const getProductById = async (req: Request, res: Response) => {
     .json(new ApiResponse(200, product, "Product Fetched Successfully"));
 };
 
-const getProductByCategory = async (req: Request, res: Response) => {
+/**
+ * Retrieves products by category with pagination.
+ *
+ * @param {Request} req - The incoming HTTP request containing category in params and pagination options in query.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response with the list of products in the specified category.
+ * @throws {ApiError} If no products are found in the specified category.
+ */
+const getProductByCategory = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   const { category } = req.params;
   const { page = 1, limit = 10 }: any = req.query;
 
@@ -159,7 +203,18 @@ const getProductByCategory = async (req: Request, res: Response) => {
   );
 };
 
-const getCarouselProducts = async (req: Request, res: Response) => {
+/**
+ * Retrieves the top 6 products with the highest rating for the homepage carousel.
+ *
+ * @param {Request} req - The incoming HTTP request.
+ * @param {Response} res - The outgoing HTTP response.
+ * @return {Promise<Response<any, Record<string, any>>>} A promise resolving to the HTTP response with the carousel products.
+ * @throws {ApiError} If fetching carousel products fails.
+ */
+const getCarouselProducts = async (
+  req: Request,
+  res: Response
+): Promise<Response<any, Record<string, any>>> => {
   try {
     const carouselProducts = await Product.aggregate([
       {

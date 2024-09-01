@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, query } from "express";
+import { Response } from "express";
 import { AuthorizedRequest } from "../interfaces/userInterface";
 import Cart from "../models/cart.model";
 import ApiResponse from "../utils/ApiResponse";
@@ -129,7 +129,18 @@ const addProducts = async (
     throw new ApiError(error.statusCode, error.message);
   }
 };
-const updateProductCount = async (req: AuthorizedRequest, res: Response) => {
+
+/**
+ * Updates the count of a product in the user's cart.
+ *
+ * @param {AuthorizedRequest} req - The incoming request with user and product information.
+ * @param {Response} res - The outgoing response with the updated cart information.
+ * @return {Promise<Response>} A promise resolving to the response with the updated cart information.
+ */
+const updateProductCount = async (
+  req: AuthorizedRequest,
+  res: Response
+): Promise<Response> => {
   const { userId } = req.user;
   const { id: productId } = req.params;
   const { count } = req.body;
@@ -149,6 +160,7 @@ const updateProductCount = async (req: AuthorizedRequest, res: Response) => {
       .json(new ApiResponse(200, {}, "Product Count Updated Successfully"));
   }
 };
+
 /**
  * Deletes specified product from the user's cart if it exists, and returns a success message if the deletion is successful. Throws an error if the cart does not exist or if there is an error during the deletion process.
  *
