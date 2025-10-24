@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler";
 import productService from "../services/product.service";
+import { CreateProductRequest } from "../interfaces/requestTypes";
 
 /**
   @desc    Create a new product
@@ -8,7 +9,7 @@ import productService from "../services/product.service";
   @access  Private
 */
 export const createProduct = asyncHandler(
-  async (req: Request, res: Response) => {
+  async (req: Request<{}, {}, CreateProductRequest>, res: Response) => {
     return productService.createProduct(req, res);
   }
 );
